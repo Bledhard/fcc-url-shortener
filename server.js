@@ -10,7 +10,7 @@ app.get('/new/:url(*)',function(req,res){
     if(validUrl.isUri(url)){
         mongo.connect(process.env.MONGOLAB_URI,function(err,db){
             if(err){
-                res.end('what the fuck is going on');
+                res.end('MongoDB connection failure');
                 return console.log(err);
             } else {
                 var urlList = db.collection('urlList');
@@ -27,7 +27,7 @@ app.get('/new/:url(*)',function(req,res){
         });
     } else {
         var data = {
-            error:'Are you fucking kidding me ? :('
+            error:'Emplty data'
         }
         res.json(data);
     }
@@ -35,14 +35,14 @@ app.get('/new/:url(*)',function(req,res){
 });
 app.get('/:id',function(req,res){
   var id = req.params.id;
-  mongo.connect(dbUrl,function(err,db){
+  mongo.connect(process.env.MONGOLAB_URI,function(err,db){
       if(err){
           return console.log(err);
       } else {
           var urlList = db.collection('urlList');
           urlList.find({short:id}).toArray(function(err,docs){
               if(err){
-                  res.end('what the fuck is going on')
+                  res.end('invalid URL')
                   return console.log('read',err);
               } else {
                     // console.log(docs.length);
@@ -51,7 +51,7 @@ app.get('/:id',function(req,res){
                         res.redirect(docs[0].url);
                     } else {
                         db.close();
-                        res.end('what the fuck is going on')
+                        res.end('...')
                     }
               }
           })
