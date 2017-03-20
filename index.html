@@ -16,23 +16,6 @@
         </ol>
     <code>https://bledhard-fcc-url-shortner.herokuapp.com/new/http://example.com</code><br>
     <code>https://bledahrd-fcc-url-shortner.herokuapp.com/1</code>
-    <h2>Make new URL</h2>
-    <form class="form">
-        <div class="form-group">
-            <input class="form-control" type="text" id="url" name="url" placeholder="http://example.com">
-        </div>
-        <div class="form-group">
-            <button id="url-btn" class="btn btn-primary">Get Short URL</button>
-        </div>
-    </form>
 </div>
-<script>
-    var btn = document.getElementById("url-btn");
-    btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        var url = document.getElementById("url").value;
-        window.location = '/new/' + url;
-    });
-</script>
 </body>
 </html>
