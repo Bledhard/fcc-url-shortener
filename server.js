@@ -24,7 +24,7 @@ app.listen(port, function(){
 });
 
 // Display the landing Page
-/*
+
 app.get('/', function(req, res) {
   var fileName = path.join(__dirname, 'index.html');
   res.sendFile(fileName, function (err) {
@@ -37,7 +37,7 @@ app.get('/', function(req, res) {
     }
   });
 });
-*/
+
 
 // Lookup a shortened URL
 app.get('/:id', function(req, res) {
