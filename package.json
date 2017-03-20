@@ -11,7 +11,7 @@
     "mongodb": "^2.2.25",
     "mongoose": "^4.9.1",
     "valid-url": "^1.0.9",
-    "shortid": "^2.2.6",
+    "shortid": "^2.2.6"
   },
   "scripts": {
     "start": "node server.js"
