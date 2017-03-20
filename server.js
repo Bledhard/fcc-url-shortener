@@ -27,12 +27,12 @@ app.get('/new/:url(*)',function(req,res){
         });
     } else {
         var data = {
-            error:'Emplty data'
+            error:'Empty data'
         }
         res.json(data);
     }
-    // res.end(req.params.url);
 });
+/*
 app.get('/:id',function(req,res){
   var id = req.params.id;
   mongo.connect(process.env.MONGOLAB_URI,function(err,db){
@@ -42,22 +42,21 @@ app.get('/:id',function(req,res){
           var urlList = db.collection('urlList');
           urlList.find({short:id}).toArray(function(err,docs){
               if(err){
-                  res.end('invalid URL')
+                  res.end('Error occured while looking for id')
                   return console.log('read',err);
               } else {
-                    // console.log(docs.length);
                     if(docs.length>0){
                         db.close();
                         res.redirect(docs[0].url);
                     } else {
                         db.close();
-                        res.end('...')
+                        res.end('No such a shortlink in database')
                     }
               }
           })
       }
   })
-});
+});*/
 app.listen(port,function(){
     console.log('everything is ok');
 })
