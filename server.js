@@ -1,98 +1,63 @@
-var express = require('express');
+var express = require("express");
+var mongo = require("mongodb").MongoClient;
+var validUrl = require("valid-url");
+var shortId = require("shortid");
+var port = process.env.PORT || 8080;
 var app = express();
-var fs = require('fs');
-var path = require('path');
-var mongoose = require('mongoose');
-
-var mongoURL = process.env.MONGOLAB_URI || "mongodb://localhost:27017/url-shortener";
-
-// Connect to database
-mongoose.connect(mongoURL);
-mongoose.connection.on('error', function(err) {
-    console.error('MongoDB connection error: ' + err);
-    process.exit(-1);
-  }
-);
-
-// Get the URL List model
-var urlList = require('./schema.js');
-
-var port = process.env.PORT;
-
-app.listen(port, function(){
-  console.log("Listening on port: " + port);
-});
-
-// Display the landing Page
-
-app.get('/', function(req, res) {
-  var fileName = path.join(__dirname, 'index.html');
-  res.sendFile(fileName, function (err) {
-    if (err) {
-      console.log(err);
-      res.status(err.status).end();
-    }
-    else {
-      console.log('Sent:', fileName);
-    }
-  });
-});
-
-
-// Lookup a shortened URL
-app.get('/:id', function(req, res) {
-  var id = parseInt(req.params.id,10);
-  if(Number.isNaN(id)) {
-    res.status(404).send("Invalid Short URL");
-  } else {
-    urlList.find({id: id}, function (err, docs) {
-      if (err) res.status(404).send(err);
-      if (docs && docs.length) {
-        res.redirect(docs[0].url);
-      } else {
-        res.status(404).send("Invalid Short URL");
-      }
-    });
-  }
-});
-
-
-// create a new shortened URL
-app.get('/new/*?', function(req,res) {
-  var validUrl = require('valid-url');
-  var theUrl = req.params[0];
-
-  // Validate the URL
-  if(theUrl && validUrl.isUri(theUrl)) {
-    // Search for URL first
-    urlList.find({url: theUrl}, function (err, docs) {
-      if(docs && docs.length) {
-        res.status(201).json({
-          "original_url": theUrl,
-          "short_url": "http://bledahrd-fcc-url-shortener.herokuapp.com/" + docs[0].id
+app.use('/',express.static('public'));
+app.get('/new/:url(*)',function(req,res){
+    var url = req.params.url;
+    if(validUrl.isUri(url)){
+        mongo.connect(process.env.MONGOLAB_URI,function(err,db){
+            if(err){
+                res.end('what the fuck is going on');
+                return console.log(err);
+            } else {
+                var urlList = db.collection('urlList');
+                var short = shortId.generate();
+                urlList.insert([{url: url, short: short}],function(){
+                    var data = {
+                        original_url: url,
+                        short_url: 'http://'+req.headers['host']+'/'+short
+                    };
+                    db.close();
+                    res.send(data);
+                });
+            }
         });
-      }
-    });
-
-    // If it's not found, create a new one
-    urlList.create({url: theUrl}, function (err, myUrl) {
-      if (err) {
-        return handleError(res, err);
-      }
-      return res.status(201).json({
-        "original_url": theUrl,
-        "short_url": "http://bledhard-fcc-url-shortener.herokuapp.com/" + myUrl.id
-      });
-    });
-  } else {
-    res.status(400).json({
-      error: "URL Invalid"
-    });
-  }
-
+    } else {
+        var data = {
+            error:'Are you fucking kidding me ? :('
+        }
+        res.json(data);
+    }
+    // res.end(req.params.url);
 });
-
-// Error Handler
-function handleError(res, err) {
-  return res.status(500).send(err);
-}
+app.get('/:id',function(req,res){
+  var id = req.params.id;
+  mongo.connect(dbUrl,function(err,db){
+      if(err){
+          return console.log(err);
+      } else {
+          var urlList = db.collection('urlList');
+          urlList.find({short:id}).toArray(function(err,docs){
+              if(err){
+                  res.end('what the fuck is going on')
+                  return console.log('read',err);
+              } else {
+                    // console.log(docs.length);
+                    if(docs.length>0){
+                        db.close();
+                        res.redirect(docs[0].url);
+                    } else {
+                        db.close();
+                        res.end('what the fuck is going on')
+                    }
+              }
+          })
+      }
+  })
+});
+app.listen(port,function(){
+    console.log('everything is ok');
+})
