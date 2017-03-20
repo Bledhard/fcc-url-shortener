@@ -17,5 +17,13 @@
     <code>https://bledhard-fcc-url-shortner.herokuapp.com/new/http://example.com</code><br>
     <code>https://bledahrd-fcc-url-shortner.herokuapp.com/1</code>
 </div>
+<script>
+    var btn = document.getElementById("url-btn");
+    btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var url = document.getElementById("url").value;
+        window.location = '/new/' + url;
+    });
+</script>
 </body>
 </html>
